@@ -4,4 +4,4 @@ This repository contains implementations of different machine learning algorithm
 
 PyTorch is generally used for algorithms that are based on neural networks.
 
-The implementation are generally done for fun, so there is no guarantee that the algorithms are bug-free or implemented in an optimal way.
+The implementations are generally done for fun, so there is no guarantee that the algorithms are bug-free or implemented in an optimal way.
