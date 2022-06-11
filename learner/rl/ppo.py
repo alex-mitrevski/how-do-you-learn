@@ -18,12 +18,20 @@ class PPOAgent(nn.Module):
     Author -- Alex Mitrevski
 
     """
-    def __init__(self, obs_len: int, number_of_actions: int, debug: bool):
+    def __init__(self, obs_len: int,
+                 number_of_actions: int,
+                 pretrained_model_path: str = None,
+                 debug: bool = False):
         super(PPOAgent, self).__init__()
         self.input_layer = nn.Linear(obs_len, 256)
         self.hidden_layer = nn.Linear(256, number_of_actions)
-        self.action_distribution = distributions.Categorical(1. / obs_len * torch.ones(obs_len))
         self.debug = debug
+        if pretrained_model_path is not None and pretrained_model_path:
+            if self.debug:
+                print('Loading saved model {0}'.format(pretrained_model_path))
+            self.load_state_dict(torch.load(pretrained_model_path))
+
+        self.action_distribution = distributions.Categorical(1. / obs_len * torch.ones(obs_len))
 
         self.old_input_layer = copy.deepcopy(self.input_layer)
         self.old_hidden_layer = copy.deepcopy(self.hidden_layer)
