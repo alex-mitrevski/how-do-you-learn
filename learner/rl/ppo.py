@@ -20,11 +20,12 @@ class PPOAgent(nn.Module):
     """
     def __init__(self, obs_len: int,
                  number_of_actions: int,
+                 hidden_layer_size: int = 256,
                  pretrained_model_path: str = None,
                  debug: bool = False):
         super(PPOAgent, self).__init__()
-        self.input_layer = nn.Linear(obs_len, 256)
-        self.hidden_layer = nn.Linear(256, number_of_actions)
+        self.input_layer = nn.Linear(obs_len, hidden_layer_size)
+        self.hidden_layer = nn.Linear(hidden_layer_size, number_of_actions)
         self.debug = debug
         if pretrained_model_path is not None and pretrained_model_path:
             if self.debug:
