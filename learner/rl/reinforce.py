@@ -121,3 +121,12 @@ class ReinforceAgent(nn.Module):
         if self.debug:
             print('Training complete')
         return average_returns
+
+    def save_parameters(self, path: str) -> None:
+        """Saves the network to a given path.
+
+        Keyword arguments:
+        path: str -- location where the parameters are saved
+
+        """
+        torch.save(self.state_dict(), path)
