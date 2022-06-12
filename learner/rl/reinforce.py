@@ -2,11 +2,12 @@ from typing import Tuple, Sequence
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.distributions as distributions
-import torch.optim as optim
 
-class ReinforceAgent(nn.Module):
+from learner.rl.agent import Agent
+from learner.rl.policy import DiscretePolicyNetwork
+
+class ReinforceAgent(Agent):
     """An implementation of the REINFORCE algorithm, mostly as described in the Open AI
     Spinning Up tutorial: https://spinningup.openai.com/en/latest/spinningup/rl_intro3.html
 
@@ -19,16 +20,12 @@ class ReinforceAgent(nn.Module):
                  pretrained_model_path: str = None,
                  debug: bool = False):
         super(ReinforceAgent, self).__init__()
-        self.input_layer = nn.Linear(obs_len, hidden_layer_size)
-        self.hidden_layer = nn.Linear(hidden_layer_size, number_of_actions)
+        self.policy = DiscretePolicyNetwork(obs_len=obs_len,
+                                            number_of_actions=number_of_actions,
+                                            hidden_layer_size=hidden_layer_size,
+                                            pretrained_model_path=pretrained_model_path)
         self.debug = debug
-        if pretrained_model_path is not None and pretrained_model_path:
-            if self.debug:
-                print('Loading saved model {0}'.format(pretrained_model_path))
-            self.load_state_dict(torch.load(pretrained_model_path))
-
         self.action_distribution = distributions.Categorical(1. / obs_len * torch.ones(obs_len))
-        self.optimizer = optim.Adam(self.parameters(), lr=0.01)
 
     def sample_action(self, obs: np.array) -> torch.Tensor:
         """Samples an action given an observation.
@@ -37,11 +34,7 @@ class ReinforceAgent(nn.Module):
         obs: np.array -- a set of observations
 
         """
-        obs_tensor = torch.Tensor(obs)
-        out = torch.tanh(self.input_layer(obs_tensor))
-        action_probabilities = torch.softmax(self.hidden_layer(out), dim=0)
-
-        self.action_distribution = distributions.Categorical(probs=action_probabilities)
+        self.action_distribution = self.policy.forward(obs)
         action = self.action_distribution.sample()
         return action
 
@@ -64,10 +57,10 @@ class ReinforceAgent(nn.Module):
                                        episode_return * episode_length
 
         """
-        self.optimizer.zero_grad()
+        self.policy.optimizer.zero_grad()
         loss = -torch.mean(episode_weights)
         loss.backward()
-        self.optimizer.step()
+        self.policy.optimizer.step()
 
     def train(self, env,
               number_of_iterations: int,
@@ -129,4 +122,4 @@ class ReinforceAgent(nn.Module):
         path: str -- location where the parameters are saved
 
         """
-        torch.save(self.state_dict(), path)
+        self.policy.save(path)
