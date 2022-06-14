@@ -15,8 +15,8 @@ A test script for running the REINFORCE learner is provided under ``scripts/test
                                            --number_of_iterations
                                            --episodes_per_iteration
                                            --training_runs
-                                           --hidden_units
                                            --debug
+                                           [--hidden_units]
                                            [--pretrained_model_path]
 
 The arguments are described below::
@@ -31,11 +31,11 @@ The arguments are described below::
         of episodes before updating the policy network)
     --training_runs -r
         Number of times to repeat the training
-    --hidden_units -hu
-        Number of hidden units in the policy network (default 32)
     --debug -d
         Flag indicating whether to print debugging messages
         to the terminal
+    --hidden_units -hu
+        Number of hidden units in the policy network (default 32)
     --pretrained_model_path -pm
         Path to a pretrained model for initialising
         the policy network (default None)
